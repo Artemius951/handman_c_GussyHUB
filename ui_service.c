@@ -49,8 +49,9 @@ void print_game_state(game_t *game) {
         printf("%c ", game->chosen_alphas[i]);
     }
     printf("\nWord: ");
-    for (int i = 0; i < MAX_WORD_LEN; i++) {
-        printf("%c ", game->guessed_word[i]);
+    int i = 0;
+    while (game->guessed_word[i] != '\0') {
+        printf("%c ", game->guessed_word[i++]);
     }
     printf("\n");
 }
