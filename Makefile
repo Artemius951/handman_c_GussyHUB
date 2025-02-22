@@ -1,16 +1,16 @@
-CFLAGS = -Wextra -Wall
+CFLAGS := -Wextra -Wall -std=c99 -O2
 
-all: program.c game.o
-	gcc $(CFLAGS) program.c game.o ui_service.o word_service.o -o main
+all: program.c game.o ui_service.o word_service.o
+	gcc $(CFLAGS) program.c game.o ui_service.o word_service.o -o app
 
-goida: program.c game.o
-	gcc $(CFLAGS) program.c game.o ui_service.o word_service.o -o main -DGOIDA
+goida: program.c game.o ui_service.o word_service.o	
+	gcc $(CFLAGS) program.c game.o ui_service.o word_service.o -DGOIDA -o app
 
 clean:
 	rm -f *.o *.out *.exe main
 
-game.o: game.c ui_service.o word_service.o
-	gcc $(CFLAGS) -c game.c ui_service.o word_service.o
+game.o: game.c
+	gcc $(CFLAGS) -c game.c
 
 ui_service.o: ui_service.c 
 	gcc $(CFLAGS) -c ui_service.c
