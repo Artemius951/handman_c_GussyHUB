@@ -7,7 +7,7 @@ goida: program.c game.o
 	gcc $(CFLAGS) program.c game.o ui_service.o word_service.o -o main -DGOIDA
 
 clean:
-	rm *.o *.out *.exe main
+	rm -f *.o *.out *.exe main
 
 game.o: game.c ui_service.o word_service.o
 	gcc $(CFLAGS) -c game.c ui_service.o word_service.o

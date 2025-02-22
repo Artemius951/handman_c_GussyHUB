@@ -1,18 +1,23 @@
 #include "game.h"
+#include "global.h"
+#include "ui_service.h"
 #include <string.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 int get_random(int max) {
-    int rand = random(max);
-    return rand;
+    int rnum = rand() % max;
+    return rnum;
 }
 int select_category(categories_t *categories) {
     printf("Choose category (pls)");
     for (int i = 0; i < categories->categories_cnt; i++) {
-        printf("%d %s", i+1, categories->category_words[i]);
+        printf("%d %s", i, categories->category_words[i].category);
     }
     int x = 0;
     scanf("%d", &x);
-    return x-1;
+    return x;
 }
 
 int select_level() {
@@ -24,7 +29,7 @@ int select_level() {
         printf("2. Hard (rock)");
         scanf("%d",&x);
     }
-    while (x != 0 || x != 1 || x != 2);
+    while ((x != 0) && (x != 1) && (x != 2));
     if (x == 0) {
         printf("You chose easy level. You're sweety UwU");
     }
@@ -40,42 +45,45 @@ int select_level() {
 void initialize_game(game_t *game, categories_t *categories) {
     int cat = select_category(categories);
     category_words_t cv = categories->category_words[cat];  
-    char category[MAX_WORD_LEN] = cv.category;
+    char *category = cv.category;
+    memmove(game->category, category, MAX_WORD_LEN);
     int level = select_level();
-    words_level_t wordl = cv.words_lvls[level];
-    char word = wordl.words[get_random(wordl.words_cnt)];
-    int hangman_state = 0;
-    int tries_left = MAX_TRIES;
-    char guessed_word[MAX_WORD_LEN]; 
-    for (int i = 0; i < strlen(word); i++) {
-        guessed_word[i] = '_';
+    game->level = level;
+    words_level_t word_level = cv.words_lvls[level];
+    char *word = word_level.words[get_random(word_level.words_cnt)];
+    memmove(game->word, word, MAX_WORD_LEN);
+    game->hangman_state = 0;
+    game->tries_left = MAX_TRIES;
+    for (size_t i = 0; i < strlen(word); i++) {
+        game->guessed_word[i] = '_';
     }
-    char chosen_alphas[ALPHABET_SIZE];
     for (int i = 0; i < ALPHABET_SIZE; i++) {
-        chosen_alphas[i] = '_';
+        game->chosen_alphas[i] = '_';
     }
+    
 }
 
 int alphabetidx(char *alphabet, char x) {
-    for (int i = 0; i < strlen(alphabet); i++) {
+    for (size_t i = 0; i < strlen(alphabet); i++) {
         if (x == alphabet[i]) {
             return i;
         }
     }
+    return -1;
 }
 
 void check_guess(game_t *game, char guess) {
-    char alphabet[ALPHABET_SIZE] = "abcdefghijklmnopqrstuvwxyz";
+    static char alphabet[ALPHABET_SIZE] = "abcdefghijklmnopqrstuvwxyz";
 
     char *nword = game->word;
-    for (int i = 0; i < strlen(nword);i++) {
+    for (size_t i = 0; i < strlen(nword);i++) {
         if (guess == nword[i]) {
             game->guessed_word[i] = guess;
-            int symb = alphabetidx(*alphabet,guess);
+            int symb = alphabetidx(alphabet, nword[i]);
             game->chosen_alphas[symb] = 'V';
         }
         else {
-            int symb = alphabetidx(*alphabet,guess);
+            int symb = alphabetidx(alphabet, nword[i]);
             game->chosen_alphas[symb] = 'X';
             game->hangman_state++;
         }
@@ -83,8 +91,8 @@ void check_guess(game_t *game, char guess) {
 }
 
 int is_game_won(game_t *game) {
-    for (int i = 0; i < strlen(game->guessed_word); i++ ) {
-        if (game->guessed_word == '_') {
+    for (size_t i = 0; i < strlen(game->guessed_word); i++ ) {
+        if (game->guessed_word[i] == '_') {
             return 0;
         }
     }
@@ -93,6 +101,8 @@ int is_game_won(game_t *game) {
 
 void play_game(game_t *game) {
     while (game->hangman_state != MAX_TRIES) {
+        print_progress_bar(game->tries_left);
+        print_game_state(game);
         printf("Choose your letter");
         char x;
         scanf("%c", &x);
