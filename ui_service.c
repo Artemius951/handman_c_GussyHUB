@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 void print_rules() {
-    printf("Hangman is a simple word guessing game. Players try to figure out an unknown word by guessing letters. If too many letters which do not appear in the word are guessed, the player is hanged (and loses).\nSetup the game by drawing a gallow and a underline for each letter in the unknown word. As letters in the word are guessed, write them above the cooresponding underline. If a letter not in the word is guess, draw a picture of a person on the gallow–one part for each incorrect letter guess. Most frequently, the person is drawn in 6 parts.");
+    printf("Hangman is a simple word guessing game.\nPlayers try to figure out an unknown word by guessing letters.\nIf too many letters which do not appear in the word are guessed, the player is hanged (and loses).\nSetup the game by drawing a gallow and a underline for each letter in the unknown word.\nAs letters in the word are guessed, write them above the cooresponding underline.\nIf a letter not in the word is guess, draw a picture of a person on the gallow–one part for each incorrect letter guess.\nMost frequently, the person is drawn in 6 parts.");
 }
 
 void print_progress_bar(int tries_left) {
@@ -49,8 +49,9 @@ void print_game_state(game_t *game) {
         printf("%c ", game->chosen_alphas[i]);
     }
     printf("\nWord: ");
-    for (int i = 0; i < MAX_WORD_LEN; i++) {
-        printf("%c ", game->guessed_word[i]);
+    int i = 0;
+    while (game->guessed_word[i] != '\0') {
+        printf("%c ", game->guessed_word[i++]);
     }
     printf("\n");
 }
